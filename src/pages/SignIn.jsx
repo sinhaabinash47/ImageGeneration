@@ -2,12 +2,16 @@ import React, { useState } from 'react'
 import { FormField } from '../components'
 import { Link, useNavigate } from 'react-router-dom';
 import '../style/LoadingSpinner.css'
+import { signInStart, signInSuccess, signInFailure } from '../redux/users/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const SignIn = () => {
   const [formData, setFormData] = useState({})
-  const [error, setError] = useState(false)
-  const [loading, setLoading] = useState(false);
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value })
@@ -16,34 +20,44 @@ export const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setError(false);
-      setLoading(true);
-      const response = await fetch('/api/v1/auth/signIn', {
+      dispatch(signInStart());
+      const res = await fetch('/api/v1/auth/signIn', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData)
       });
-      const data = await response.json();
-      setLoading(true);
+      const data = await res.json();
       if (data.success === false) {
-        setError(true);
+        setTimeout(() => {
+          dispatch(signInFailure(data.message));
+          toast.success(data.message ? data.message || 'Something went wrong !' : '', {
+            position: 'top-right',
+            autoClose: 2000,
+            style: { backgroundColor: 'black', color: 'white' }
+          });
+        }, 2000)
         return;
-      }
+      };
+      toast.success('Sign In successfully..!', {
+        position: 'top-right',
+        autoClose: 2000,
+        style: { backgroundColor: 'black', color: 'white' },
+      });
       setTimeout(() => {
+        dispatch(signInSuccess(data));
         navigate('/home');
-        setError(false);
-      }, 2000)
+      }, 2000);
     } catch (error) {
-      setError(true);
-      setLoading(false);
+      dispatch(signInFailure(error));
     }
   };
 
   return (
     <div className='max-w-lg mx-auto'>
       <h1 className='text-3xl text-center font-semibold my-8'> Sign In</h1>
+      <ToastContainer />
       {loading && (
         <div className='loader-overlay'>
           <div className='loader'></div>
@@ -73,7 +87,6 @@ export const SignIn = () => {
             <p>Don't Have an account?</p>
             <Link to="/"><p className='text-blue-500'>Sing Up</p></Link>
           </div>
-          <p className='text-red-700 '>{error && 'Something went wrong !'}</p>
         </div>
       </form>
     </div>
