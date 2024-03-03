@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { FormField } from '../components'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom';
+import '../style/LoadingSpinner.css'
 
 export const SignUp = () => {
     const [formData, setFormData] = useState({})
     const [error, setError] = useState(false)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value })
     }
@@ -13,8 +16,8 @@ export const SignUp = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setError(false);
             setLoading(true);
-            setError(false)
             const response = await fetch('/api/v1/auth/signUp', {
                 method: 'POST',
                 headers: {
@@ -23,20 +26,29 @@ export const SignUp = () => {
                 body: JSON.stringify(formData)
             });
             const data = await response.json();
-            setLoading(false);
+            setLoading(true);
             if (data.success === false) {
                 setError(true);
                 return;
             }
-            setError(false);
+            setTimeout(() => {
+                navigate('/sign-in');
+                setError(false);
+            }, 2000)
         } catch (error) {
-            setLoading(false);
             setError(true);
+            setLoading(false);
         }
-    }
+    };
+
     return (
         <div className='max-w-lg mx-auto'>
             <h1 className='text-3xl text-center font-semibold my-8'> Sign Up</h1>
+            {loading && (
+                <div className='loader-overlay'>
+                    <div className='loader'></div>
+                </div>
+            )}
             <form className='max-w-3xl' onSubmit={handleSubmit}>
                 <div className='flex flex-col gap-5'>
                     <FormField
