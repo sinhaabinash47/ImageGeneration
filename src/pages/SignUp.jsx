@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { FormField } from '../components'
 import { Link, useNavigate } from 'react-router-dom';
 import '../style/LoadingSpinner.css'
+import { OAuth } from '../components/OAuth';
 
 export const SignUp = () => {
     const [formData, setFormData] = useState({})
@@ -76,6 +77,7 @@ export const SignUp = () => {
                         className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>
                         {loading ? 'loading...!' : 'Sign Up'}
                     </button>
+                    <OAuth/>
                     <div className='flex gap-2 '>
                         <p>Have an account?</p>
                         <Link to="/sign-in"><p className='text-blue-500'>Sing In</p></Link>

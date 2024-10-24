@@ -6,12 +6,13 @@ import { signInStart, signInSuccess, signInFailure } from '../redux/users/userSl
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { OAuth } from '../components/OAuth';
 
 export const SignIn = () => {
   const [formData, setFormData] = useState({})
   const { loading, error } = useSelector((state) => state.user);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value })
@@ -83,6 +84,7 @@ export const SignIn = () => {
             className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'>
             Sign In
           </button>
+          <OAuth/>
           <div className='flex gap-2 '>
             <p>Don't Have an account?</p>
             <Link to="/"><p className='text-blue-500'>Sing Up</p></Link>
